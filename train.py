@@ -24,7 +24,7 @@ def d_optim(E, D, source_features, target_features, optimizer, n):
 							retain_graph=True, only_inputs=True)[0]
 	gradient_penalty = ((gradients.norm(2, dim=1) - 1) ** 2).mean()
 	# 2. D loss
-	d_loss = -torch.mean(e_target) + torch.mean(e_source) + n * gradient_penalty
+	d_loss = -n * (torch.mean(D(e_target)) + torch.mean(D(e_source))) + gradient_penalty
 	d_loss.backward()
 	E.zero_grad()
 	optimizer.step()
@@ -173,7 +173,7 @@ Batch_size_s = int(length_source_training / 25) + 1
 Batch_size_t = int(length_target / 25) + 1
 num_epochs = 200
 m = 1
-n = 1
+n = 10 ** (-7)
 E = Extractor()
 D = Discriminator()
 R = Regressor()
